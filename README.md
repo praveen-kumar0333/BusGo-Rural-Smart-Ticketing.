@@ -1,7 +1,8 @@
 # 🚌 BusGo: Rural Smart Ticketing System
 **Empowering Rural Connectivity through Digital Innovation**
 
-[![Live Demo](https://img.shields.io/badge/demo-live-green.svg)](https://praveen-kumar0333.github.io/BusGo-Rural-Smart-Ticketing/)
+Live demo :  https://praveen-kumar0333.github.io/BusGo-Rural-Smart-Ticketing./
+
 
 ## 🌟 Overview
 BusGo is a specialized React-based ticketing solution designed to bridge the digital divide in rural transportation. Developed as a high-performance web application, it simplifies the journey for villagers and bus operators by removing the need for physical currency and providing real-time data accessibility.
