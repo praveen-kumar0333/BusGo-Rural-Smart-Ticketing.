@@ -17,7 +17,7 @@
     </script>
 </body>
 </html> -->
-
+<!-- 
 
 <!DOCTYPE html>
 <html lang="en">
@@ -51,6 +51,129 @@
             }
         };
         renderApp();
+    </script>
+</body>
+</html> -->
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BusGo - Rural Smart Ticketing</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        body { margin: 0; background-color: #070d1a; color: #e2e8f0; font-family: system-ui, -apple-system, sans-serif; }
+        * { box-sizing: border-box; }
+        .loading-screen { display: flex; justify-content: center; align-items: center; height: 100vh; font-size: 24px; font-weight: bold; color: #667eea; }
+    </style>
+</head>
+<body>
+    <div id="root">
+        <div class="loading-screen">Loading BusGo Rural System...</div>
+    </div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // ─── DATA & TRANSLATIONS ─────────────────────────────────────────────
+        const TRANSLATIONS = {
+            en: { name: "English", flag: "🇬🇧", appName: "BusGo", tagline: "Rural Bus Ticketing", login: "Login", register: "Register", heroTitle: "Your Village,", heroTitleAccent: "Connected.", heroSub: "Book nearby bus tickets instantly. Pay digitally. No change needed.", getStarted: "Get Started", bookTicket: "Book Ticket", trackBus: "Track Bus", payment: "Payment", feedback: "Feedback", loginTitle: "Welcome Back", registerTitle: "Create Account", searchBuses: "Search Buses" },
+            hi: { name: "हिंदी", flag: "🇮🇳", appName: "बसगो", tagline: "ग्रामीण बस टिकटिंग", login: "लॉगिन", register: "रजिस्टर", heroTitle: "आपका गाँव,", heroTitleAccent: "जुड़ा हुआ।", heroSub: "नजदीकी बस टिकट तुरंत बुक करें। डिजिटल भुगतान करें।", getStarted: "शुरू करें", bookTicket: "टिकट बुक करें", trackBus: "बस ट्रैक करें", payment: "भुगतान", feedback: "प्रतिक्रिया", loginTitle: "वापस स्वागत है", registerTitle: "खाता बनाएं", searchBuses: "बस खोजें" },
+            kn: { name: "ಕನ್ನಡ", flag: "🇮🇳", appName: "ಬಸ್‌ಗೋ", tagline: "ಗ್ರಾಮೀಣ ಬಸ್ ಟಿಕೆಟಿಂಗ್", login: "ಲಾಗಿನ್", register: "ನೋಂದಣಿ", heroTitle: "ನಿಮ್ಮ ಹಳ್ಳಿ,", heroTitleAccent: "ಸಂಪರ್ಕಗೊಂಡಿದೆ.", heroSub: "ಹತ್ತಿರದ ಬಸ್ ಟಿಕೆಟ್ ತಕ್ಷಣ ಬುಕ್ ಮಾಡಿ. ಡಿಜಿಟಲ್ ಪಾವತಿ ಮಾಡಿ.", getStarted: "ಪ್ರಾರಂಭಿಸಿ", bookTicket: "ಟಿಕೆಟ್ ಬುಕ್ ಮಾಡಿ", trackBus: "ಬಸ್ ಟ್ರ್ಯಾಕ್", payment: "ಪಾವತಿ", feedback: "ಪ್ರತಿಕ್ರಿಯೆ", loginTitle: "ಮರಳಿ ಸ್ವಾಗತ", registerTitle: "ಖಾತೆ ತೆರೆಯಿರಿ", searchBuses: "ಬಸ್ ಹುಡುಕಿ" }
+        };
+
+        const RURAL_BUSES = [
+            { id: "KA-101", name: "Mysuru Sarige", stops: ["Mysuru", "Mandya", "Bengaluru"], timings: ["06:00", "06:45", "09:00"], fare_per_km: 1.2, total_km: 139, color: "#667eea", speed: 52 },
+            { id: "KA-102", name: "Mandya Express", stops: ["Mysuru", "Mandya", "Bengaluru"], timings: ["08:30", "09:15", "11:30"], fare_per_km: 1.2, total_km: 139, color: "#38ef7d", speed: 45 }
+        ];
+
+        const ALL_STOPS = ["Mysuru", "Mandya", "Bengaluru", "Hubballi", "Dharwad", "Gadag"].sort();
+
+        const S = {
+            container: { maxWidth: 1100, margin: "0 auto", padding: "0 20px" },
+            card: { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 20, marginTop: 20 },
+            btn: {
+                primary: { background: "linear-gradient(135deg,#667eea,#764ba2)", color: "#fff", border: "none", borderRadius: 10, padding: "12px 24px", cursor: "pointer", fontWeight: 700 },
+                secondary: { background: "rgba(255,255,255,0.07)", color: "#e2e8f0", border: "1px solid #333", borderRadius: 10, padding: "12px 24px", cursor: "pointer" }
+            },
+            input: { width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid #333", borderRadius: 10, padding: 12, color: "#fff", marginBottom: 15 }
+        };
+
+        // ─── COMPONENTS ───────────────────────────────────────────────────────
+
+        function Navbar({ user, setPage, lang, setLang, t }) {
+            return (
+                <nav style={{ background: "rgba(7,13,26,0.95)", padding: 15, borderBottom: "1px solid #222" }}>
+                    <div style={{ ...S.container, display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                        <div onClick={() => setPage("home")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
+                            <span style={{ fontSize: 24 }}>🚌</span>
+                            <span style={{ fontWeight: 800, color: "#667eea", fontSize: 20 }}>{t.appName}</span>
+                        </div>
+                        <div style={{ display: "flex", gap: 10 }}>
+                            {user ? <button onClick={() => setPage("dashboard")} style={S.btn.secondary}>Dashboard</button> : <button onClick={() => setPage("login")} style={S.btn.primary}>{t.login}</button>}
+                        </div>
+                    </div>
+                </nav>
+            );
+        }
+
+        function App() {
+            const [page, setPage] = useState("home");
+            const [lang, setLang] = useState("en");
+            const [user, setUser] = useState(null);
+            const t = TRANSLATIONS[lang];
+
+            return (
+                <div>
+                    <Navbar user={user} setPage={setPage} lang={lang} setLang={setLang} t={t} />
+                    <main style={S.container}>
+                        {page === "home" && (
+                            <div style={{ textAlign: "center", padding: "100px 20px" }}>
+                                <h1 style={{ fontSize: 52 }}>{t.heroTitle} <span style={{ color: "#667eea" }}>{t.heroTitleAccent}</span></h1>
+                                <p style={{ fontSize: 18, color: "#64748b" }}>{t.heroSub}</p>
+                                <button onClick={() => setPage("register")} style={{ ...S.btn.primary, marginTop: 30 }}>{t.getStarted}</button>
+                            </div>
+                        )}
+
+                        {page === "dashboard" && (
+                            <div style={{ padding: "40px 0" }}>
+                                <h2 style={{ fontSize: 32 }}>Welcome, {user?.name}! 👋</h2>
+                                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginTop: 30 }}>
+                                    {["bookTicket", "trackBus", "payment", "feedback"].map(feat => (
+                                        <div key={feat} style={S.card} onClick={() => setPage(feat)}>
+                                            <h3>{t[feat]}</h3>
+                                            <p style={{ color: "#64748b" }}>Access your {feat} features here.</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {(page === "login" || page === "register") && (
+                            <div style={{ display: "flex", justifyContent: "center", padding: "100px 0" }}>
+                                <div style={{ ...S.card, width: 400, textAlign: "center" }}>
+                                    <h2>{page === "login" ? t.loginTitle : t.registerTitle}</h2>
+                                    <input style={S.input} placeholder="Email or Mobile" id="auth-email" />
+                                    <button style={{ ...S.btn.primary, width: "100%" }} onClick={() => {
+                                        const email = document.getElementById('auth-email').value;
+                                        setUser({ name: email.split('@')[0] || "User" });
+                                        setPage("dashboard");
+                                    }}>Continue</button>
+                                </div>
+                            </div>
+                        )}
+                    </main>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
     </script>
 </body>
 </html>
