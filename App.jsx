@@ -1591,453 +1591,453 @@
  * Includes: Live Tracking, 7 Languages, Payment Gateway, and Feedback
  */
 
-const { useState, useEffect, useRef } = React;
+// const { useState, useEffect, useRef } = React;
 
-// ─── TRANSLATIONS (7 languages) ──────────────────────────────────────────────
-const TRANSLATIONS = {
-  en: {
-    name: "English", flag: "🇬🇧",
-    appName: "BusGo", tagline: "Rural Bus Ticketing",
-    home: "Home", login: "Login", register: "Register",
-    dashboard: "Dashboard", bookTicket: "Book Ticket",
-    trackBus: "Track Bus", payment: "Payment", feedback: "Feedback",
-    logout: "Logout", welcome: "Welcome back",
-    heroTitle: "Your Village,", heroTitleAccent: "Connected.",
-    heroSub: "Book nearby bus tickets instantly. Pay digitally to conductor. No change needed.",
-    getStarted: "Get Started", learnMore: "Learn More",
-    features: "Why BusGo?", featInstant: "Instant Booking",
-    featInstantDesc: "Book your seat in seconds, anytime anywhere.",
-    featDigital: "Digital Payment", featDigitalDesc: "Pay conductor digitally — no change needed.",
-    featTrack: "Live Tracking", featTrackDesc: "Know exactly where your bus is, in real time.",
-    featFeedback: "Share Feedback", featFeedbackDesc: "Help improve bus services with your reviews.",
-    loginTitle: "Welcome Back", registerTitle: "Create Account",
-    email: "Email / Mobile", password: "Password", name: "Full Name",
-    otp: "Enter OTP", sendOtp: "Send OTP", verifyOtp: "Verify OTP",
-    loginBtn: "Login", registerBtn: "Register",
-    noAccount: "Don't have an account?", hasAccount: "Already have an account?",
-    from: "From (Village/Town)", to: "To (Village/Town)", date: "Date",
-    searchBuses: "Search Buses", availableBuses: "Available Buses",
-    seats: "seats left", bookNow: "Book Now", busName: "Bus Name",
-    departs: "Departs", arrives: "Arrives", fare: "Fare", class: "Type",
-    ticketConfirmed: "Ticket Confirmed!", ticketId: "Ticket ID",
-    passenger: "Passenger", journey: "Journey", downloadTicket: "Download Ticket",
-    payNow: "Pay Now", payToConductor: "Pay to Conductor",
-    amount: "Amount", paymentSuccess: "Payment Successful!",
-    paymentFail: "Payment Failed. Try again.",
-    processingPayment: "Processing...", scanQr: "Scan QR to pay conductor",
-    busLocation: "Live Bus Location", lastUpdated: "Last updated",
-    speed: "Speed", eta: "ETA", busNo: "Bus No.",
-    yourFeedback: "Your Feedback", rating: "Rating",
-    feedbackMsg: "Your message", submitFeedback: "Submit Feedback",
-    thanksFeedback: "Thank you for your feedback!",
-    recentFeedback: "Recent Feedback",
-    myTickets: "My Tickets", quickActions: "Quick Actions",
-    active: "Active", completed: "Completed", cancelled: "Cancelled",
-    kmh: "km/h", mins: "mins away", stars: "stars",
-    liveStatus: "Live Status", currentStop: "Current Stop",
-    nextStop: "Next Stop", distanceAway: "km away",
-    busOnTime: "On Time", busDelayed: "Delayed", busArrived: "Arrived",
-    villageRoute: "Village Route", shortDistance: "Short Route",
-    totalDistance: "Distance", stops: "Stops",
-    boardingPoint: "Boarding Point", droppingPoint: "Dropping Point",
-    nearbyBuses: "Nearby Buses", arrivingSoon: "Arriving Soon",
-    liveTracking: "LIVE", busStatus: "Bus Status",
-    minutesLate: "mins late", minutesEarly: "mins early",
-    reachesYourStop: "Reaches your stop in",
-    selectStop: "Select Stop",
-  },
-  hi: {
-    name: "हिंदी", flag: "🇮🇳",
-    appName: "बसगो", tagline: "ग्रामीण बस टिकटिंग",
-    home: "होम", login: "लॉगिन", register: "रजिस्टर",
-    dashboard: "डैशबोर्ड", bookTicket: "टिकट बुक करें",
-    trackBus: "बस ट्रैक करें", payment: "भुगतान", feedback: "प्रतिक्रिया",
-    logout: "लॉगआउट", welcome: "वापस स्वागत है",
-    heroTitle: "आपका गाँव,", heroTitleAccent: "जुड़ा हुआ।",
-    heroSub: "नजदीकी बस टिकट तुरंत बुक करें। कंडक्टर को डिजिटल भुगतान करें।",
-    getStarted: "शुरू करें", learnMore: "और जानें",
-    features: "बसगो क्यों?", featInstant: "तुरंत बुकिंग",
-    featInstantDesc: "कहीं भी, कभी भी सेकंड में सीट बुक करें।",
-    featDigital: "डिजिटल भुगतान", featDigitalDesc: "कंडक्टर को डिजिटल भुगतान।",
-    featTrack: "लाइव ट्रैकिंग", featTrackDesc: "जानिए आपकी बस कहाँ है।",
-    featFeedback: "प्रतिक्रिया दें", featFeedbackDesc: "अपनी समीक्षा दें।",
-    loginTitle: "वापस स्वागत है", registerTitle: "खाता बनाएं",
-    email: "ईमेल / मोबाइल", password: "पासवर्ड", name: "पूरा नाम",
-    otp: "OTP दर्ज करें", sendOtp: "OTP भेजें", verifyOtp: "OTP सत्यापित करें",
-    loginBtn: "लॉगिन", registerBtn: "रजिस्टर",
-    noAccount: "खाता नहीं है?", hasAccount: "पहले से खाता है?",
-    from: "कहाँ से (गाँव/शहर)", to: "कहाँ तक (गाँव/शहर)", date: "तारीख",
-    searchBuses: "बस खोजें", availableBuses: "उपलब्ध बसें",
-    seats: "सीटें बची", bookNow: "अभी बुक करें", busName: "बस का नाम",
-    departs: "प्रस्थान", arrives: "आगमन", fare: "किराया", class: "प्रकार",
-    ticketConfirmed: "टिकट कन्फर्म!", ticketId: "टिकट ID",
-    passenger: "यात्री", journey: "यात्रा", downloadTicket: "टिकट डाउनलोड",
-    payNow: "अभी भुगतान करें", payToConductor: "कंडक्टर को भुगतान",
-    amount: "राशि", paymentSuccess: "भुगतान सफल!", paymentFail: "भुगतान विफल।",
-    processingPayment: "प्रोसेसिंग...", scanQr: "QR स्कैन करें",
-    busLocation: "लाइव बस स्थान", lastUpdated: "अंतिम अपडेट",
-    speed: "गति", eta: "ETA", busNo: "बस नं.",
-    yourFeedback: "आपकी प्रतिक्रिया", rating: "रेटिंग",
-    feedbackMsg: "आपका संदेश", submitFeedback: "प्रतिक्रिया भेजें",
-    thanksFeedback: "धन्यवाद!", recentFeedback: "हाल की प्रतिक्रिया",
-    myTickets: "मेरे टिकट", quickActions: "त्वरित क्रियाएं",
-    active: "सक्रिय", completed: "पूर्ण", cancelled: "रद्द",
-    kmh: "किमी/घं", mins: "मिनट दूर",
-    liveStatus: "लाइव स्थिति", currentStop: "वर्तमान स्टॉप",
-    nextStop: "अगला स्टॉप", distanceAway: "किमी दूर",
-    busOnTime: "समय पर", busDelayed: "देरी", busArrived: "पहुँच गई",
-    villageRoute: "ग्रामीण रूट", shortDistance: "छोटा रूट",
-    totalDistance: "दूरी", stops: "स्टॉप",
-    boardingPoint: "चढ़ने का स्थान", droppingPoint: "उतरने का स्थान",
-    nearbyBuses: "नजदीकी बसें", arrivingSoon: "जल्द आ रही है",
-    liveTracking: "लाइव", busStatus: "बस स्थिति",
-    minutesLate: "मिनट देरी", minutesEarly: "मिनट पहले",
-    reachesYourStop: "आपके स्टॉप पर पहुँचेगी",
-    selectStop: "स्टॉप चुनें",
-  },
-  kn: {
-    name: "ಕನ್ನಡ", flag: "🇮🇳",
-    appName: "ಬಸ್‌ಗೋ", tagline: "ಗ್ರಾಮೀಣ ಬಸ್ ಟಿಕೆಟಿಂಗ್",
-    home: "ಮುಖಪುಟ", login: "ಲಾಗಿನ್", register: "ನೋಂದಣಿ",
-    dashboard: "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್", bookTicket: "ಟಿಕೆಟ್ ಬುಕ್ ಮಾಡಿ",
-    trackBus: "ಬಸ್ ಟ್ರ್ಯಾಕ್", payment: "ಪಾವತಿ", feedback: "ಪ್ರತಿಕ್ರಿಯೆ",
-    logout: "ಲಾಗ್‌ಔಟ್", welcome: "ಮರಳಿ ಸ್ವಾಗತ",
-    heroTitle: "ನಿಮ್ಮ ಹಳ್ಳಿ,", heroTitleAccent: "ಸಂಪರ್ಕಗೊಂಡಿದೆ.",
-    heroSub: "ಹತ್ತಿರದ ಬಸ್ ಟಿಕೆಟ್ ತಕ್ಷಣ ಬುಕ್ ಮಾಡಿ. ಕಂಡಕ್ಟರ್‌ಗೆ ಡಿಜಿಟಲ್ ಪಾವತಿ ಮಾಡಿ.",
-    getStarted: "ಪ್ರಾರಂಭಿಸಿ", learnMore: "ಇನ್ನಷ್ಟು ತಿಳಿಯಿರಿ",
-    features: "ಬಸ್‌ಗೋ ಏಕೆ?", featInstant: "ತಕ್ಷಣ ಬುಕಿಂಗ್",
-    featInstantDesc: "ಎಲ್ಲಿಂದಲಾದರೂ ಸೆಕೆಂಡುಗಳಲ್ಲಿ ಸೀಟು ಬುಕ್ ಮಾಡಿ.",
-    featDigital: "ಡಿಜಿಟಲ್ ಪಾವತಿ", featDigitalDesc: "ಚಿಲ್ಲರೆ ಇಲ್ಲದೆ ಕಂಡಕ್ಟರ್‌ಗೆ ಪಾವತಿ ಮಾಡಿ.",
-    featTrack: "ನೇರ ಟ್ರ್ಯಾಕಿಂಗ್", featTrackDesc: "ನಿಮ್ಮ ಬಸ್ ಎಲ್ಲಿದೆ ಎಂದು ತಿಳಿಯಿರಿ.",
-    featFeedback: "ಪ್ರತಿಕ್ರಿಯೆ ಹಂಚಿಕೊಳ್ಳಿ", featFeedbackDesc: "ನಿಮ್ಮ ಅನುಭವ ಹಂಚಿಕೊಳ್ಳಿ.",
-    loginTitle: "ಮರಳಿ ಸ್ವಾಗತ", registerTitle: "ಖಾತೆ ತೆರೆಯಿರಿ",
-    email: "ಇಮೇಲ್ / ಮೊಬೈಲ್", password: "ಪಾಸ್‌ವರ್ಡ್", name: "ಪೂರ್ಣ ಹೆಸರು",
-    otp: "OTP ನಮೂದಿಸಿ", sendOtp: "OTP ಕಳುಹಿಸಿ", verifyOtp: "OTP ಪರಿಶೀಲಿಸಿ",
-    loginBtn: "ಲಾಗಿನ್", registerBtn: "ನೋಂದಣಿ",
-    noAccount: "ಖಾತೆ ಇಲ್ಲವೇ?", hasAccount: "ಈಗಾಗಲೇ ಖಾತೆ ಇದೆಯೇ?",
-    from: "ಎಲ್ಲಿಂದ (ಹಳ್ಳಿ/ಪಟ್ಟಣ)", to: "ಎಲ್ಲಿಗೆ (ಹಳ್ಳಿ/ಪಟ್ಟಣ)", date: "ದಿನಾಂಕ",
-    searchBuses: "ಬಸ್ ಹುಡುಕಿ", availableBuses: "ಲಭ್ಯ ಬಸ್‌ಗಳು",
-    seats: "ಸೀಟುಗಳು ಬಾಕಿ", bookNow: "ಈಗ ಬುಕ್ ಮಾಡಿ", busName: "ಬಸ್ ಹೆಸರು",
-    departs: "ಹೊರಡುತ್ತದೆ", arrives: "ತಲುಪುತ್ತದೆ", fare: "ದರ", class: "ವಿಧ",
-    ticketConfirmed: "ಟಿಕೆಟ್ ದೃಢಪಟ್ಟಿದೆ!", ticketId: "ಟಿಕೆಟ್ ID",
-    passenger: "ಪ್ರಯಾಣಿಕ", journey: "ಪ್ರಯಾಣ", downloadTicket: "ಟಿಕೆಟ್ ಡೌನ್‌ಲೋಡ್",
-    payNow: "ಈಗ ಪಾವತಿ ಮಾಡಿ", payToConductor: "ಕಂಡಕ್ಟರ್‌ಗೆ ಪಾವತಿ",
-    amount: "ಮೊತ್ತ", paymentSuccess: "ಪಾವತಿ ಯಶಸ್ವಿ!", paymentFail: "ಪಾವತಿ ವಿಫಲ.",
-    processingPayment: "ಪ್ರಕ್ರಿಯೆ ನಡೆಯುತ್ತಿದೆ...", scanQr: "ಕಂಡಕ್ಟರ್‌ಗೆ QR ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
-    busLocation: "ನೇರ ಬಸ್ ಸ್ಥಳ", lastUpdated: "ಕೊನೆಯ ಅಪ್‌ಡೇಟ್",
-    speed: "ವೇಗ", eta: "ETA", busNo: "ಬಸ್ ಸಂ.",
-    yourFeedback: "ನಿಮ್ಮ ಪ್ರತಿಕ್ರಿಯೆ", rating: "ರೇಟಿಂಗ್",
-    feedbackMsg: "ನಿಮ್ಮ ಸಂದೇಶ", submitFeedback: "ಪ್ರತಿಕ್ರಿಯೆ ಸಲ್ಲಿಸಿ",
-    thanksFeedback: "ನಿಮ್ಮ ಪ್ರತಿಕ್ರಿಯೆಗೆ ಧನ್ಯವಾದ!",
-    recentFeedback: "ಇತ್ತೀಚಿನ ಪ್ರತಿಕ್ರಿಯೆಗಳು",
-    myTickets: "ನನ್ನ ಟಿಕೆಟ್‌ಗಳು", quickActions: "ತ್ವರಿತ ಕ್ರಿಯೆಗಳು",
-    active: "ಸಕ್ರಿಯ", completed: "ಮುಗಿದಿದೆ", cancelled: "ರದ್ದು",
-    kmh: "ಕಿಮೀ/ಗಂ", mins: "ನಿಮಿಷ ದೂರ",
-    liveStatus: "ನೇರ ಸ್ಥಿತಿ", currentStop: "ಪ್ರಸ್ತುತ ನಿಲ್ದಾಣ",
-    nextStop: "ಮುಂದಿನ ನಿಲ್ದಾಣ", distanceAway: "ಕಿಮೀ ದೂರ",
-    busOnTime: "ಸಮಯಕ್ಕೆ", busDelayed: "ತಡವಾಗಿದೆ", busArrived: "ತಲುಪಿದೆ",
-    villageRoute: "ಹಳ್ಳಿ ಮಾರ್ಗ", shortDistance: "ಸಣ್ಣ ಮಾರ್ಗ",
-    totalDistance: "ದೂರ", stops: "ನಿಲ್ದಾಣಗಳು",
-    boardingPoint: "ಹತ್ತುವ ಸ್ಥಳ", droppingPoint: "ಇಳಿಯುವ ಸ್ಥಳ",
-    nearbyBuses: "ಹತ್ತಿರದ ಬಸ್‌ಗಳು", arrivingSoon: "ಶೀಘ್ರದಲ್ಲಿ ಬರುತ್ತಿದೆ",
-    liveTracking: "ನೇರ", busStatus: "ಬಸ್ ಸ್ಥಿತಿ",
-    minutesLate: "ನಿಮಿಷ ತಡ", minutesEarly: "ನಿಮಿಷ ಮುಂಚೆ",
-    reachesYourStop: "ನಿಮ್ಮ ನಿಲ್ದಾಣ ತಲುಪುತ್ತದೆ",
-    selectStop: "ನಿಲ್ದಾಣ ಆಯ್ಕೆ ಮಾಡಿ",
-  },
-  ta: {
-    name: "தமிழ்", flag: "🇮🇳",
-    appName: "பஸ்கோ", tagline: "கிராமப்புற பஸ் டிக்கெட்",
-    home: "முகப்பு", login: "உள்நுழைவு", register: "பதிவு",
-    dashboard: "டாஷ்போர்டு", bookTicket: "டிக்கெட் பதிவு",
-    trackBus: "பஸ் கண்காணிப்பு", payment: "கட்டணம்", feedback: "கருத்து",
-    logout: "வெளியேறு", welcome: "மீண்டும் வரவேற்கிறோம்",
-    heroTitle: "உங்கள் கிராமம்,", heroTitleAccent: "இணைக்கப்பட்டுள்ளது.",
-    heroSub: "அருகிலுள்ள பஸ் டிக்கெட் உடனடியாக பதிவு செய்யுங்கள். டிஜிட்டலாக செலுத்துங்கள்.",
-    getStarted: "தொடங்கு", learnMore: "மேலும் அறிய",
-    features: "ஏன் பஸ்கோ?", featInstant: "உடனடி பதிவு",
-    featInstantDesc: "எங்கும் நொடியில் இடம் பதிவு செய்யுங்கள்.",
-    featDigital: "டிஜிட்டல் கட்டணம்", featDigitalDesc: "நடத்துனருக்கு டிஜிட்டலாக செலுத்துங்கள்.",
-    featTrack: "நேரலை கண்காணிப்பு", featTrackDesc: "பஸ் எங்கிருக்கிறது என்று தெரிந்துகொள்ளுங்கள்.",
-    featFeedback: "கருத்து பகிருங்கள்", featFeedbackDesc: "உங்கள் அனுபவம் பகிருங்கள்.",
-    loginTitle: "மீண்டும் வரவேற்கிறோம்", registerTitle: "கணக்கு உருவாக்கு",
-    email: "மின்னஞ்சல் / மொபைல்", password: "கடவுச்சொல்", name: "முழு பெயர்",
-    otp: "OTP உள்ளிடவும்", sendOtp: "OTP அனுப்பு", verifyOtp: "OTP சரிபார்",
-    loginBtn: "உள்நுழைவு", registerBtn: "பதிவு செய்",
-    noAccount: "கணக்கு இல்லையா?", hasAccount: "ஏற்கனவே கணக்கு இருக்கிறதா?",
-    from: "எங்கிருந்து (கிராமம்/நகரம்)", to: "எங்கே (கிராமம்/நகரம்)", date: "தேதி",
-    searchBuses: "பஸ் தேடு", availableBuses: "கிடைக்கும் பேருந்துகள்",
-    seats: "இடங்கள் உள்ளன", bookNow: "இப்போது பதிவு", busName: "பஸ் பெயர்",
-    departs: "புறப்படும்", arrives: "வரும்", fare: "கட்டணம்", class: "வகை",
-    ticketConfirmed: "டிக்கெட் உறுதி!", ticketId: "டிக்கெட் ID",
-    passenger: "பயணி", journey: "பயணம்", downloadTicket: "டிக்கெட் பதிவிறக்கு",
-    payNow: "இப்போது செலுத்து", payToConductor: "நடத்துனருக்கு செலுத்து",
-    amount: "தொகை", paymentSuccess: "கட்டணம் வெற்றி!", paymentFail: "கட்டணம் தோல்வி.",
-    processingPayment: "செயலாக்குகிறது...", scanQr: "QR ஸ்கேன் செய்யுங்கள்",
-    busLocation: "நேரலை பஸ் இருப்பிடம்", lastUpdated: "கடைசி புதுப்பிப்பு",
-    speed: "வேகம்", eta: "ETA", busNo: "பஸ் எண்.",
-    yourFeedback: "உங்கள் கருத்து", rating: "மதிப்பீடு",
-    feedbackMsg: "உங்கள் செய்தி", submitFeedback: "கருத்து சமர்ப்பி",
-    thanksFeedback: "நன்றி!", recentFeedback: "சமீபத்திய கருத்துகள்",
-    myTickets: "என் டிக்கெட்கள்", quickActions: "விரைவு செயல்கள்",
-    active: "செயலில்", completed: "முடிந்தது", cancelled: "ரத்து",
-    kmh: "கிமீ/மணி", mins: "நிமிடங்கள்",
-    liveStatus: "நேரலை நிலை", currentStop: "தற்போதைய நிறுத்தம்",
-    nextStop: "அடுத்த நிறுத்தம்", distanceAway: "கிமீ தொலைவு",
-    busOnTime: "சரியான நேரம்", busDelayed: "தாமதம்", busArrived: "வந்தது",
-    villageRoute: "கிராம பாதை", shortDistance: "குறுகிய பாதை",
-    totalDistance: "தூரம்", stops: "நிறுத்தங்கள்",
-    boardingPoint: "ஏறும் இடம்", droppingPoint: "இறங்கும் இடம்",
-    nearbyBuses: "அருகிலுள்ள பேருந்துகள்", arrivingSoon: "விரைவில் வருகிறது",
-    liveTracking: "நேரலை", busStatus: "பஸ் நிலை",
-    minutesLate: "நிமிட தாமதம்", minutesEarly: "நிமிடம் முன்னதாக",
-    reachesYourStop: "உங்கள் நிறுத்தத்தை அடையும்",
-    selectStop: "நிறுத்தம் தேர்வு",
-  },
-  te: {
-    name: "తెలుగు", flag: "🇮🇳",
-    appName: "బస్‌గో", tagline: "గ్రామీణ బస్ టిక్కెటింగ్",
-    home: "హోమ్", login: "లాగిన్", register: "నమోదు",
-    dashboard: "డాష్‌బోర్డ్", bookTicket: "టిక్కెట్ బుక్",
-    trackBus: "బస్ ట్రాక్", payment: "చెల్లింపు", feedback: "అభిప్రాయం",
-    logout: "లాగ్అవుట్", welcome: "తిరిగి స్వాగతం",
-    heroTitle: "మీ గ్రామం,", heroTitleAccent: "అనుసంధానించబడింది.",
-    heroSub: "దగ్గరలోని బస్ టిక్కెట్ వెంటనే బుక్ చేయండి. డిజిటల్గా చెల్లించండి.",
-    getStarted: "ప్రారంభించండి", learnMore: "మరింత తెలుసుకోండి",
-    features: "బస్‌గో ఎందుకు?", featInstant: "తక్షణ బుకింగ్",
-    featInstantDesc: "సెకన్లలో సీట్ బుక్ చేయండి.", featDigital: "డిజిటల్ చెల్లింపు",
-    featDigitalDesc: "చిల్లర లేకుండా కండక్టర్‌కు చెల్లించండి.",
-    featTrack: "లైవ్ ట్రాకింగ్", featTrackDesc: "బస్ ఎక్కడ ఉందో తెలుసుకోండి.",
-    featFeedback: "అభిప్రాయం పంచుకోండి", featFeedbackDesc: "మీ అనుభవం పంచుకోండి.",
-    loginTitle: "తిరిగి స్వాగతం", registerTitle: "ఖాతా సృష్టించండి",
-    email: "ఇమెయిల్ / మొబైల్", password: "పాస్‌వర్డ్", name: "పూర్తి పేరు",
-    otp: "OTP నమోదు", sendOtp: "OTP పంపండి", verifyOtp: "OTP ధృవీకరించండి",
-    loginBtn: "లాగిన్", registerBtn: "నమోదు",
-    noAccount: "ఖాతా లేదా?", hasAccount: "ఖాతా ఉందా?",
-    from: "ఎక్కడ నుండి (గ్రామం/పట్టణం)", to: "ఎక్కడికి (గ్రామం/పట్టణం)", date: "తేదీ",
-    searchBuses: "బస్ వెతకండి", availableBuses: "అందుబాటులో ఉన్న బస్సులు",
-    seats: "సీట్లు మిగిలాయి", bookNow: "ఇప్పుడే బుక్", busName: "బస్ పేరు",
-    departs: "బయలుదేరు", arrives: "చేరుకుంటుంది", fare: "చార్జ్", class: "రకం",
-    ticketConfirmed: "టిక్కెట్ నిర్ధారణ!", ticketId: "టిక్కెట్ ID",
-    passenger: "ప్రయాణికుడు", journey: "ప్రయాణం", downloadTicket: "టిక్కెట్ డౌన్‌లోడ్",
-    payNow: "ఇప్పుడు చెల్లించండి", payToConductor: "కండక్టర్‌కు చెల్లించండి",
-    amount: "మొత్తం", paymentSuccess: "చెల్లింపు విజయం!", paymentFail: "చెల్లింపు విఫలం.",
-    processingPayment: "ప్ర్రాసెస్ అవుతోంది...", scanQr: "QR స్కాన్ చేయండి",
-    busLocation: "లైవ్ బస్ స్థానం", lastUpdated: "చివరిగా నవీకరించబడింది",
-    speed: "వేగం", eta: "ETA", busNo: "బస్ నం.",
-    yourFeedback: "మీ అభిప్రాయం", rating: "రేటింగ్",
-    feedbackMsg: "మీ సందేశం", submitFeedback: "సమర్పించండి",
-    thanksFeedback: "ధన్యవాదాలు!", recentFeedback: "ఇటీవలి అభిప్రాయాలు",
-    myTickets: "నా టిక్కెట్లు", quickActions: "త్వరిత చర్యలు",
-    active: "చురుకుగా", completed: "పూర్తయింది", cancelled: "రద్దు",
-    kmh: "కిమీ/గం", mins: "నిమిషాలు దూరంలో",
-    liveStatus: "లైవ్ స్థితి", currentStop: "ప్రస్తుత స్టాప్",
-    nextStop: "తదుపరి స్టాప్", distanceAway: "కిమీ దూరంలో",
-    busOnTime: "సమయానికి", busDelayed: "ఆలస్యం", busArrived: "వచ్చింది",
-    villageRoute: "గ్రామ మార్గం", shortDistance: "చిన్న మార్గం",
-    totalDistance: "దూరం", stops: "స్టాప్‌లు",
-    boardingPoint: "ఎక్కే స్థలం", droppingPoint: "దిగే స్థలం",
-    nearbyBuses: "దగ్గరలోని బస్సులు", arrivingSoon: "త్వరలో వస్తోంది",
-    liveTracking: "లైవ్", busStatus: "బస్ స్థితి",
-    minutesLate: "నిమిషాలు ఆలస్యం", minutesEarly: "నిమిషాలు ముందు",
-    reachesYourStop: "మీ స్టాప్ చేరుకుంటుంది",
-    selectStop: "స్టాప్ ఎంచుకోండి",
-  },
-};
+// // ─── TRANSLATIONS (7 languages) ──────────────────────────────────────────────
+// const TRANSLATIONS = {
+//   en: {
+//     name: "English", flag: "🇬🇧",
+//     appName: "BusGo", tagline: "Rural Bus Ticketing",
+//     home: "Home", login: "Login", register: "Register",
+//     dashboard: "Dashboard", bookTicket: "Book Ticket",
+//     trackBus: "Track Bus", payment: "Payment", feedback: "Feedback",
+//     logout: "Logout", welcome: "Welcome back",
+//     heroTitle: "Your Village,", heroTitleAccent: "Connected.",
+//     heroSub: "Book nearby bus tickets instantly. Pay digitally to conductor. No change needed.",
+//     getStarted: "Get Started", learnMore: "Learn More",
+//     features: "Why BusGo?", featInstant: "Instant Booking",
+//     featInstantDesc: "Book your seat in seconds, anytime anywhere.",
+//     featDigital: "Digital Payment", featDigitalDesc: "Pay conductor digitally — no change needed.",
+//     featTrack: "Live Tracking", featTrackDesc: "Know exactly where your bus is, in real time.",
+//     featFeedback: "Share Feedback", featFeedbackDesc: "Help improve bus services with your reviews.",
+//     loginTitle: "Welcome Back", registerTitle: "Create Account",
+//     email: "Email / Mobile", password: "Password", name: "Full Name",
+//     otp: "Enter OTP", sendOtp: "Send OTP", verifyOtp: "Verify OTP",
+//     loginBtn: "Login", registerBtn: "Register",
+//     noAccount: "Don't have an account?", hasAccount: "Already have an account?",
+//     from: "From (Village/Town)", to: "To (Village/Town)", date: "Date",
+//     searchBuses: "Search Buses", availableBuses: "Available Buses",
+//     seats: "seats left", bookNow: "Book Now", busName: "Bus Name",
+//     departs: "Departs", arrives: "Arrives", fare: "Fare", class: "Type",
+//     ticketConfirmed: "Ticket Confirmed!", ticketId: "Ticket ID",
+//     passenger: "Passenger", journey: "Journey", downloadTicket: "Download Ticket",
+//     payNow: "Pay Now", payToConductor: "Pay to Conductor",
+//     amount: "Amount", paymentSuccess: "Payment Successful!",
+//     paymentFail: "Payment Failed. Try again.",
+//     processingPayment: "Processing...", scanQr: "Scan QR to pay conductor",
+//     busLocation: "Live Bus Location", lastUpdated: "Last updated",
+//     speed: "Speed", eta: "ETA", busNo: "Bus No.",
+//     yourFeedback: "Your Feedback", rating: "Rating",
+//     feedbackMsg: "Your message", submitFeedback: "Submit Feedback",
+//     thanksFeedback: "Thank you for your feedback!",
+//     recentFeedback: "Recent Feedback",
+//     myTickets: "My Tickets", quickActions: "Quick Actions",
+//     active: "Active", completed: "Completed", cancelled: "Cancelled",
+//     kmh: "km/h", mins: "mins away", stars: "stars",
+//     liveStatus: "Live Status", currentStop: "Current Stop",
+//     nextStop: "Next Stop", distanceAway: "km away",
+//     busOnTime: "On Time", busDelayed: "Delayed", busArrived: "Arrived",
+//     villageRoute: "Village Route", shortDistance: "Short Route",
+//     totalDistance: "Distance", stops: "Stops",
+//     boardingPoint: "Boarding Point", droppingPoint: "Dropping Point",
+//     nearbyBuses: "Nearby Buses", arrivingSoon: "Arriving Soon",
+//     liveTracking: "LIVE", busStatus: "Bus Status",
+//     minutesLate: "mins late", minutesEarly: "mins early",
+//     reachesYourStop: "Reaches your stop in",
+//     selectStop: "Select Stop",
+//   },
+//   hi: {
+//     name: "हिंदी", flag: "🇮🇳",
+//     appName: "बसगो", tagline: "ग्रामीण बस टिकटिंग",
+//     home: "होम", login: "लॉगिन", register: "रजिस्टर",
+//     dashboard: "डैशबोर्ड", bookTicket: "टिकट बुक करें",
+//     trackBus: "बस ट्रैक करें", payment: "भुगतान", feedback: "प्रतिक्रिया",
+//     logout: "लॉगआउट", welcome: "वापस स्वागत है",
+//     heroTitle: "आपका गाँव,", heroTitleAccent: "जुड़ा हुआ।",
+//     heroSub: "नजदीकी बस टिकट तुरंत बुक करें। कंडक्टर को डिजिटल भुगतान करें।",
+//     getStarted: "शुरू करें", learnMore: "और जानें",
+//     features: "बसगो क्यों?", featInstant: "तुरंत बुकिंग",
+//     featInstantDesc: "कहीं भी, कभी भी सेकंड में सीट बुक करें।",
+//     featDigital: "डिजिटल भुगतान", featDigitalDesc: "कंडक्टर को डिजिटल भुगतान।",
+//     featTrack: "लाइव ट्रैकिंग", featTrackDesc: "जानिए आपकी बस कहाँ है।",
+//     featFeedback: "प्रतिक्रिया दें", featFeedbackDesc: "अपनी समीक्षा दें।",
+//     loginTitle: "वापस स्वागत है", registerTitle: "खाता बनाएं",
+//     email: "ईमेल / मोबाइल", password: "पासवर्ड", name: "पूरा नाम",
+//     otp: "OTP दर्ज करें", sendOtp: "OTP भेजें", verifyOtp: "OTP सत्यापित करें",
+//     loginBtn: "लॉगिन", registerBtn: "रजिस्टर",
+//     noAccount: "खाता नहीं है?", hasAccount: "पहले से खाता है?",
+//     from: "कहाँ से (गाँव/शहर)", to: "कहाँ तक (गाँव/शहर)", date: "तारीख",
+//     searchBuses: "बस खोजें", availableBuses: "उपलब्ध बसें",
+//     seats: "सीटें बची", bookNow: "अभी बुक करें", busName: "बस का नाम",
+//     departs: "प्रस्थान", arrives: "आगमन", fare: "किराया", class: "प्रकार",
+//     ticketConfirmed: "टिकट कन्फर्म!", ticketId: "टिकट ID",
+//     passenger: "यात्री", journey: "यात्रा", downloadTicket: "टिकट डाउनलोड",
+//     payNow: "अभी भुगतान करें", payToConductor: "कंडक्टर को भुगतान",
+//     amount: "राशि", paymentSuccess: "भुगतान सफल!", paymentFail: "भुगतान विफल।",
+//     processingPayment: "प्रोसेसिंग...", scanQr: "QR स्कैन करें",
+//     busLocation: "लाइव बस स्थान", lastUpdated: "अंतिम अपडेट",
+//     speed: "गति", eta: "ETA", busNo: "बस नं.",
+//     yourFeedback: "आपकी प्रतिक्रिया", rating: "रेटिंग",
+//     feedbackMsg: "आपका संदेश", submitFeedback: "प्रतिक्रिया भेजें",
+//     thanksFeedback: "धन्यवाद!", recentFeedback: "हाल की प्रतिक्रिया",
+//     myTickets: "मेरे टिकट", quickActions: "त्वरित क्रियाएं",
+//     active: "सक्रिय", completed: "पूर्ण", cancelled: "रद्द",
+//     kmh: "किमी/घं", mins: "मिनट दूर",
+//     liveStatus: "लाइव स्थिति", currentStop: "वर्तमान स्टॉप",
+//     nextStop: "अगला स्टॉप", distanceAway: "किमी दूर",
+//     busOnTime: "समय पर", busDelayed: "देरी", busArrived: "पहुँच गई",
+//     villageRoute: "ग्रामीण रूट", shortDistance: "छोटा रूट",
+//     totalDistance: "दूरी", stops: "स्टॉप",
+//     boardingPoint: "चढ़ने का स्थान", droppingPoint: "उतरने का स्थान",
+//     nearbyBuses: "नजदीकी बसें", arrivingSoon: "जल्द आ रही है",
+//     liveTracking: "लाइव", busStatus: "बस स्थिति",
+//     minutesLate: "मिनट देरी", minutesEarly: "मिनट पहले",
+//     reachesYourStop: "आपके स्टॉप पर पहुँचेगी",
+//     selectStop: "स्टॉप चुनें",
+//   },
+//   kn: {
+//     name: "ಕನ್ನಡ", flag: "🇮🇳",
+//     appName: "ಬಸ್‌ಗೋ", tagline: "ಗ್ರಾಮೀಣ ಬಸ್ ಟಿಕೆಟಿಂಗ್",
+//     home: "ಮುಖಪುಟ", login: "ಲಾಗಿನ್", register: "ನೋಂದಣಿ",
+//     dashboard: "ಡ್ಯಾಶ್‌ಬೋರ್ಡ್", bookTicket: "ಟಿಕೆಟ್ ಬುಕ್ ಮಾಡಿ",
+//     trackBus: "ಬಸ್ ಟ್ರ್ಯಾಕ್", payment: "ಪಾವತಿ", feedback: "ಪ್ರತಿಕ್ರಿಯೆ",
+//     logout: "ಲಾಗ್‌ಔಟ್", welcome: "ಮರಳಿ ಸ್ವಾಗತ",
+//     heroTitle: "ನಿಮ್ಮ ಹಳ್ಳಿ,", heroTitleAccent: "ಸಂಪರ್ಕಗೊಂಡಿದೆ.",
+//     heroSub: "ಹತ್ತಿರದ ಬಸ್ ಟಿಕೆಟ್ ತಕ್ಷಣ ಬುಕ್ ಮಾಡಿ. ಕಂಡಕ್ಟರ್‌ಗೆ ಡಿಜಿಟಲ್ ಪಾವತಿ ಮಾಡಿ.",
+//     getStarted: "ಪ್ರಾರಂಭಿಸಿ", learnMore: "ಇನ್ನಷ್ಟು ತಿಳಿಯಿರಿ",
+//     features: "ಬಸ್‌ಗೋ ಏಕೆ?", featInstant: "ತಕ್ಷಣ ಬುಕಿಂಗ್",
+//     featInstantDesc: "ಎಲ್ಲಿಂದಲಾದರೂ ಸೆಕೆಂಡುಗಳಲ್ಲಿ ಸೀಟು ಬುಕ್ ಮಾಡಿ.",
+//     featDigital: "ಡಿಜಿಟಲ್ ಪಾವತಿ", featDigitalDesc: "ಚಿಲ್ಲರೆ ಇಲ್ಲದೆ ಕಂಡಕ್ಟರ್‌ಗೆ ಪಾವತಿ ಮಾಡಿ.",
+//     featTrack: "ನೇರ ಟ್ರ್ಯಾಕಿಂಗ್", featTrackDesc: "ನಿಮ್ಮ ಬಸ್ ಎಲ್ಲಿದೆ ಎಂದು ತಿಳಿಯಿರಿ.",
+//     featFeedback: "ಪ್ರತಿಕ್ರಿಯೆ ಹಂಚಿಕೊಳ್ಳಿ", featFeedbackDesc: "ನಿಮ್ಮ ಅನುಭವ ಹಂಚಿಕೊಳ್ಳಿ.",
+//     loginTitle: "ಮರಳಿ ಸ್ವಾಗತ", registerTitle: "ಖಾತೆ ತೆರೆಯಿರಿ",
+//     email: "ಇಮೇಲ್ / ಮೊಬೈಲ್", password: "ಪಾಸ್‌ವರ್ಡ್", name: "ಪೂರ್ಣ ಹೆಸರು",
+//     otp: "OTP ನಮೂದಿಸಿ", sendOtp: "OTP ಕಳುಹಿಸಿ", verifyOtp: "OTP ಪರಿಶೀಲಿಸಿ",
+//     loginBtn: "ಲಾಗಿನ್", registerBtn: "ನೋಂದಣಿ",
+//     noAccount: "ಖಾತೆ ಇಲ್ಲವೇ?", hasAccount: "ಈಗಾಗಲೇ ಖಾತೆ ಇದೆಯೇ?",
+//     from: "ಎಲ್ಲಿಂದ (ಹಳ್ಳಿ/ಪಟ್ಟಣ)", to: "ಎಲ್ಲಿಗೆ (ಹಳ್ಳಿ/ಪಟ್ಟಣ)", date: "ದಿನಾಂಕ",
+//     searchBuses: "ಬಸ್ ಹುಡುಕಿ", availableBuses: "ಲಭ್ಯ ಬಸ್‌ಗಳು",
+//     seats: "ಸೀಟುಗಳು ಬಾಕಿ", bookNow: "ಈಗ ಬುಕ್ ಮಾಡಿ", busName: "ಬಸ್ ಹೆಸರು",
+//     departs: "ಹೊರಡುತ್ತದೆ", arrives: "ತಲುಪುತ್ತದೆ", fare: "ದರ", class: "ವಿಧ",
+//     ticketConfirmed: "ಟಿಕೆಟ್ ದೃಢಪಟ್ಟಿದೆ!", ticketId: "ಟಿಕೆಟ್ ID",
+//     passenger: "ಪ್ರಯಾಣಿಕ", journey: "ಪ್ರಯಾಣ", downloadTicket: "ಟಿಕೆಟ್ ಡೌನ್‌ಲೋಡ್",
+//     payNow: "ಈಗ ಪಾವತಿ ಮಾಡಿ", payToConductor: "ಕಂಡಕ್ಟರ್‌ಗೆ ಪಾವತಿ",
+//     amount: "ಮೊತ್ತ", paymentSuccess: "ಪಾವತಿ ಯಶಸ್ವಿ!", paymentFail: "ಪಾವತಿ ವಿಫಲ.",
+//     processingPayment: "ಪ್ರಕ್ರಿಯೆ ನಡೆಯುತ್ತಿದೆ...", scanQr: "ಕಂಡಕ್ಟರ್‌ಗೆ QR ಸ್ಕ್ಯಾನ್ ಮಾಡಿ",
+//     busLocation: "ನೇರ ಬಸ್ ಸ್ಥಳ", lastUpdated: "ಕೊನೆಯ ಅಪ್‌ಡೇಟ್",
+//     speed: "ವೇಗ", eta: "ETA", busNo: "ಬಸ್ ಸಂ.",
+//     yourFeedback: "ನಿಮ್ಮ ಪ್ರತಿಕ್ರಿಯೆ", rating: "ರೇಟಿಂಗ್",
+//     feedbackMsg: "ನಿಮ್ಮ ಸಂದೇಶ", submitFeedback: "ಪ್ರತಿಕ್ರಿಯೆ ಸಲ್ಲಿಸಿ",
+//     thanksFeedback: "ನಿಮ್ಮ ಪ್ರತಿಕ್ರಿಯೆಗೆ ಧನ್ಯವಾದ!",
+//     recentFeedback: "ಇತ್ತೀಚಿನ ಪ್ರತಿಕ್ರಿಯೆಗಳು",
+//     myTickets: "ನನ್ನ ಟಿಕೆಟ್‌ಗಳು", quickActions: "ತ್ವರಿತ ಕ್ರಿಯೆಗಳು",
+//     active: "ಸಕ್ರಿಯ", completed: "ಮುಗಿದಿದೆ", cancelled: "ರದ್ದು",
+//     kmh: "ಕಿಮೀ/ಗಂ", mins: "ನಿಮಿಷ ದೂರ",
+//     liveStatus: "ನೇರ ಸ್ಥಿತಿ", currentStop: "ಪ್ರಸ್ತುತ ನಿಲ್ದಾಣ",
+//     nextStop: "ಮುಂದಿನ ನಿಲ್ದಾಣ", distanceAway: "ಕಿಮೀ ದೂರ",
+//     busOnTime: "ಸಮಯಕ್ಕೆ", busDelayed: "ತಡವಾಗಿದೆ", busArrived: "ತಲುಪಿದೆ",
+//     villageRoute: "ಹಳ್ಳಿ ಮಾರ್ಗ", shortDistance: "ಸಣ್ಣ ಮಾರ್ಗ",
+//     totalDistance: "ದೂರ", stops: "ನಿಲ್ದಾಣಗಳು",
+//     boardingPoint: "ಹತ್ತುವ ಸ್ಥಳ", droppingPoint: "ಇಳಿಯುವ ಸ್ಥಳ",
+//     nearbyBuses: "ಹತ್ತಿರದ ಬಸ್‌ಗಳು", arrivingSoon: "ಶೀಘ್ರದಲ್ಲಿ ಬರುತ್ತಿದೆ",
+//     liveTracking: "ನೇರ", busStatus: "ಬಸ್ ಸ್ಥಿತಿ",
+//     minutesLate: "ನಿಮಿಷ ತಡ", minutesEarly: "ನಿಮಿಷ ಮುಂಚೆ",
+//     reachesYourStop: "ನಿಮ್ಮ ನಿಲ್ದಾಣ ತಲುಪುತ್ತದೆ",
+//     selectStop: "ನಿಲ್ದಾಣ ಆಯ್ಕೆ ಮಾಡಿ",
+//   },
+//   ta: {
+//     name: "தமிழ்", flag: "🇮🇳",
+//     appName: "பஸ்கோ", tagline: "கிராமப்புற பஸ் டிக்கெட்",
+//     home: "முகப்பு", login: "உள்நுழைவு", register: "பதிவு",
+//     dashboard: "டாஷ்போர்டு", bookTicket: "டிக்கெட் பதிவு",
+//     trackBus: "பஸ் கண்காணிப்பு", payment: "கட்டணம்", feedback: "கருத்து",
+//     logout: "வெளியேறு", welcome: "மீண்டும் வரவேற்கிறோம்",
+//     heroTitle: "உங்கள் கிராமம்,", heroTitleAccent: "இணைக்கப்பட்டுள்ளது.",
+//     heroSub: "அருகிலுள்ள பஸ் டிக்கெட் உடனடியாக பதிவு செய்யுங்கள். டிஜிட்டலாக செலுத்துங்கள்.",
+//     getStarted: "தொடங்கு", learnMore: "மேலும் அறிய",
+//     features: "ஏன் பஸ்கோ?", featInstant: "உடனடி பதிவு",
+//     featInstantDesc: "எங்கும் நொடியில் இடம் பதிவு செய்யுங்கள்.",
+//     featDigital: "டிஜிட்டல் கட்டணம்", featDigitalDesc: "நடத்துனருக்கு டிஜிட்டலாக செலுத்துங்கள்.",
+//     featTrack: "நேரலை கண்காணிப்பு", featTrackDesc: "பஸ் எங்கிருக்கிறது என்று தெரிந்துகொள்ளுங்கள்.",
+//     featFeedback: "கருத்து பகிருங்கள்", featFeedbackDesc: "உங்கள் அனுபவம் பகிருங்கள்.",
+//     loginTitle: "மீண்டும் வரவேற்கிறோம்", registerTitle: "கணக்கு உருவாக்கு",
+//     email: "மின்னஞ்சல் / மொபைல்", password: "கடவுச்சொல்", name: "முழு பெயர்",
+//     otp: "OTP உள்ளிடவும்", sendOtp: "OTP அனுப்பு", verifyOtp: "OTP சரிபார்",
+//     loginBtn: "உள்நுழைவு", registerBtn: "பதிவு செய்",
+//     noAccount: "கணக்கு இல்லையா?", hasAccount: "ஏற்கனவே கணக்கு இருக்கிறதா?",
+//     from: "எங்கிருந்து (கிராமம்/நகரம்)", to: "எங்கே (கிராமம்/நகரம்)", date: "தேதி",
+//     searchBuses: "பஸ் தேடு", availableBuses: "கிடைக்கும் பேருந்துகள்",
+//     seats: "இடங்கள் உள்ளன", bookNow: "இப்போது பதிவு", busName: "பஸ் பெயர்",
+//     departs: "புறப்படும்", arrives: "வரும்", fare: "கட்டணம்", class: "வகை",
+//     ticketConfirmed: "டிக்கெட் உறுதி!", ticketId: "டிக்கெட் ID",
+//     passenger: "பயணி", journey: "பயணம்", downloadTicket: "டிக்கெட் பதிவிறக்கு",
+//     payNow: "இப்போது செலுத்து", payToConductor: "நடத்துனருக்கு செலுத்து",
+//     amount: "தொகை", paymentSuccess: "கட்டணம் வெற்றி!", paymentFail: "கட்டணம் தோல்வி.",
+//     processingPayment: "செயலாக்குகிறது...", scanQr: "QR ஸ்கேன் செய்யுங்கள்",
+//     busLocation: "நேரலை பஸ் இருப்பிடம்", lastUpdated: "கடைசி புதுப்பிப்பு",
+//     speed: "வேகம்", eta: "ETA", busNo: "பஸ் எண்.",
+//     yourFeedback: "உங்கள் கருத்து", rating: "மதிப்பீடு",
+//     feedbackMsg: "உங்கள் செய்தி", submitFeedback: "கருத்து சமர்ப்பி",
+//     thanksFeedback: "நன்றி!", recentFeedback: "சமீபத்திய கருத்துகள்",
+//     myTickets: "என் டிக்கெட்கள்", quickActions: "விரைவு செயல்கள்",
+//     active: "செயலில்", completed: "முடிந்தது", cancelled: "ரத்து",
+//     kmh: "கிமீ/மணி", mins: "நிமிடங்கள்",
+//     liveStatus: "நேரலை நிலை", currentStop: "தற்போதைய நிறுத்தம்",
+//     nextStop: "அடுத்த நிறுத்தம்", distanceAway: "கிமீ தொலைவு",
+//     busOnTime: "சரியான நேரம்", busDelayed: "தாமதம்", busArrived: "வந்தது",
+//     villageRoute: "கிராம பாதை", shortDistance: "குறுகிய பாதை",
+//     totalDistance: "தூரம்", stops: "நிறுத்தங்கள்",
+//     boardingPoint: "ஏறும் இடம்", droppingPoint: "இறங்கும் இடம்",
+//     nearbyBuses: "அருகிலுள்ள பேருந்துகள்", arrivingSoon: "விரைவில் வருகிறது",
+//     liveTracking: "நேரலை", busStatus: "பஸ் நிலை",
+//     minutesLate: "நிமிட தாமதம்", minutesEarly: "நிமிடம் முன்னதாக",
+//     reachesYourStop: "உங்கள் நிறுத்தத்தை அடையும்",
+//     selectStop: "நிறுத்தம் தேர்வு",
+//   },
+//   te: {
+//     name: "తెలుగు", flag: "🇮🇳",
+//     appName: "బస్‌గో", tagline: "గ్రామీణ బస్ టిక్కెటింగ్",
+//     home: "హోమ్", login: "లాగిన్", register: "నమోదు",
+//     dashboard: "డాష్‌బోర్డ్", bookTicket: "టిక్కెట్ బుక్",
+//     trackBus: "బస్ ట్రాక్", payment: "చెల్లింపు", feedback: "అభిప్రాయం",
+//     logout: "లాగ్అవుట్", welcome: "తిరిగి స్వాగతం",
+//     heroTitle: "మీ గ్రామం,", heroTitleAccent: "అనుసంధానించబడింది.",
+//     heroSub: "దగ్గరలోని బస్ టిక్కెట్ వెంటనే బుక్ చేయండి. డిజిటల్గా చెల్లించండి.",
+//     getStarted: "ప్రారంభించండి", learnMore: "మరింత తెలుసుకోండి",
+//     features: "బస్‌గో ఎందుకు?", featInstant: "తక్షణ బుకింగ్",
+//     featInstantDesc: "సెకన్లలో సీట్ బుక్ చేయండి.", featDigital: "డిజిటల్ చెల్లింపు",
+//     featDigitalDesc: "చిల్లర లేకుండా కండక్టర్‌కు చెల్లించండి.",
+//     featTrack: "లైవ్ ట్రాకింగ్", featTrackDesc: "బస్ ఎక్కడ ఉందో తెలుసుకోండి.",
+//     featFeedback: "అభిప్రాయం పంచుకోండి", featFeedbackDesc: "మీ అనుభవం పంచుకోండి.",
+//     loginTitle: "తిరిగి స్వాగతం", registerTitle: "ఖాతా సృష్టించండి",
+//     email: "ఇమెయిల్ / మొబైల్", password: "పాస్‌వర్డ్", name: "పూర్తి పేరు",
+//     otp: "OTP నమోదు", sendOtp: "OTP పంపండి", verifyOtp: "OTP ధృవీకరించండి",
+//     loginBtn: "లాగిన్", registerBtn: "నమోదు",
+//     noAccount: "ఖాతా లేదా?", hasAccount: "ఖాతా ఉందా?",
+//     from: "ఎక్కడ నుండి (గ్రామం/పట్టణం)", to: "ఎక్కడికి (గ్రామం/పట్టణం)", date: "తేదీ",
+//     searchBuses: "బస్ వెతకండి", availableBuses: "అందుబాటులో ఉన్న బస్సులు",
+//     seats: "సీట్లు మిగిలాయి", bookNow: "ఇప్పుడే బుక్", busName: "బస్ పేరు",
+//     departs: "బయలుదేరు", arrives: "చేరుకుంటుంది", fare: "చార్జ్", class: "రకం",
+//     ticketConfirmed: "టిక్కెట్ నిర్ధారణ!", ticketId: "టిక్కెట్ ID",
+//     passenger: "ప్రయాణికుడు", journey: "ప్రయాణం", downloadTicket: "టిక్కెట్ డౌన్‌లోడ్",
+//     payNow: "ఇప్పుడు చెల్లించండి", payToConductor: "కండక్టర్‌కు చెల్లించండి",
+//     amount: "మొత్తం", paymentSuccess: "చెల్లింపు విజయం!", paymentFail: "చెల్లింపు విఫలం.",
+//     processingPayment: "ప్ర్రాసెస్ అవుతోంది...", scanQr: "QR స్కాన్ చేయండి",
+//     busLocation: "లైవ్ బస్ స్థానం", lastUpdated: "చివరిగా నవీకరించబడింది",
+//     speed: "వేగం", eta: "ETA", busNo: "బస్ నం.",
+//     yourFeedback: "మీ అభిప్రాయం", rating: "రేటింగ్",
+//     feedbackMsg: "మీ సందేశం", submitFeedback: "సమర్పించండి",
+//     thanksFeedback: "ధన్యవాదాలు!", recentFeedback: "ఇటీవలి అభిప్రాయాలు",
+//     myTickets: "నా టిక్కెట్లు", quickActions: "త్వరిత చర్యలు",
+//     active: "చురుకుగా", completed: "పూర్తయింది", cancelled: "రద్దు",
+//     kmh: "కిమీ/గం", mins: "నిమిషాలు దూరంలో",
+//     liveStatus: "లైవ్ స్థితి", currentStop: "ప్రస్తుత స్టాప్",
+//     nextStop: "తదుపరి స్టాప్", distanceAway: "కిమీ దూరంలో",
+//     busOnTime: "సమయానికి", busDelayed: "ఆలస్యం", busArrived: "వచ్చింది",
+//     villageRoute: "గ్రామ మార్గం", shortDistance: "చిన్న మార్గం",
+//     totalDistance: "దూరం", stops: "స్టాప్‌లు",
+//     boardingPoint: "ఎక్కే స్థలం", droppingPoint: "దిగే స్థలం",
+//     nearbyBuses: "దగ్గరలోని బస్సులు", arrivingSoon: "త్వరలో వస్తోంది",
+//     liveTracking: "లైవ్", busStatus: "బస్ స్థితి",
+//     minutesLate: "నిమిషాలు ఆలస్యం", minutesEarly: "నిమిషాలు ముందు",
+//     reachesYourStop: "మీ స్టాప్ చేరుకుంటుంది",
+//     selectStop: "స్టాప్ ఎంచుకోండి",
+//   },
+// };
 
-// ─── DATA & STYLES ───────────────────────────────────────────────────────────
-const RURAL_BUSES = [
-  {
-    id: "KA-101", name: "Mysuru Sarige", type: "KSRTC",
-    stops: ["Mysuru", "Srirangapatna", "Mandya", "Maddur", "Channapatna", "Ramanagara", "Bengaluru"],
-    timings: ["06:00", "06:18", "06:45", "07:10", "07:35", "08:05", "09:00"],
-    fare_per_km: 1.2, total_km: 139, seats: 18, color: "#667eea",
-    currentStopIndex: 2, delayMins: 0, speed: 52,
-    description: "Connects Mysuru to Bengaluru via villages",
-  },
-  {
-    id: "KA-102", name: "Mandya Express", type: "KSRTC",
-    stops: ["Mysuru", "Srirangapatna", "Mandya", "Maddur", "Channapatna", "Ramanagara", "Bengaluru"],
-    timings: ["08:30", "08:48", "09:15", "09:40", "10:05", "10:35", "11:30"],
-    fare_per_km: 1.2, total_km: 139, seats: 6, color: "#38ef7d",
-    currentStopIndex: 0, delayMins: 8, speed: 45,
-    description: "Morning express via Mandya",
-  },
-];
+// // ─── DATA & STYLES ───────────────────────────────────────────────────────────
+// const RURAL_BUSES = [
+//   {
+//     id: "KA-101", name: "Mysuru Sarige", type: "KSRTC",
+//     stops: ["Mysuru", "Srirangapatna", "Mandya", "Maddur", "Channapatna", "Ramanagara", "Bengaluru"],
+//     timings: ["06:00", "06:18", "06:45", "07:10", "07:35", "08:05", "09:00"],
+//     fare_per_km: 1.2, total_km: 139, seats: 18, color: "#667eea",
+//     currentStopIndex: 2, delayMins: 0, speed: 52,
+//     description: "Connects Mysuru to Bengaluru via villages",
+//   },
+//   {
+//     id: "KA-102", name: "Mandya Express", type: "KSRTC",
+//     stops: ["Mysuru", "Srirangapatna", "Mandya", "Maddur", "Channapatna", "Ramanagara", "Bengaluru"],
+//     timings: ["08:30", "08:48", "09:15", "09:40", "10:05", "10:35", "11:30"],
+//     fare_per_km: 1.2, total_km: 139, seats: 6, color: "#38ef7d",
+//     currentStopIndex: 0, delayMins: 8, speed: 45,
+//     description: "Morning express via Mandya",
+//   },
+// ];
 
-const ALL_STOPS = [...new Set(RURAL_BUSES.flatMap(b => b.stops))].sort();
+// const ALL_STOPS = [...new Set(RURAL_BUSES.flatMap(b => b.stops))].sort();
 
-const S = {
-  page: { minHeight: "100vh", background: "#070d1a", color: "#e2e8f0", fontFamily: "system-ui" },
-  container: { maxWidth: 1100, margin: "0 auto", padding: "0 20px" },
-  card: { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 20 },
-  flexBetween: { display: "flex", alignItems: "center", justifyContent: "space-between" },
-  input: { width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid #333", borderRadius: 10, padding: 12, color: "#fff" },
-  btn: {
-    primary: { background: "linear-gradient(135deg,#667eea,#764ba2)", color: "#fff", border: "none", borderRadius: 10, padding: "12px 24px", cursor: "pointer", fontWeight: 700 },
-    secondary: { background: "rgba(255,255,255,0.07)", color: "#e2e8f0", border: "1px solid #333", borderRadius: 10, padding: "12px 24px", cursor: "pointer" }
-  }
-};
+// const S = {
+//   page: { minHeight: "100vh", background: "#070d1a", color: "#e2e8f0", fontFamily: "system-ui" },
+//   container: { maxWidth: 1100, margin: "0 auto", padding: "0 20px" },
+//   card: { background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 16, padding: 20 },
+//   flexBetween: { display: "flex", alignItems: "center", justifyContent: "space-between" },
+//   input: { width: "100%", background: "rgba(255,255,255,0.06)", border: "1px solid #333", borderRadius: 10, padding: 12, color: "#fff" },
+//   btn: {
+//     primary: { background: "linear-gradient(135deg,#667eea,#764ba2)", color: "#fff", border: "none", borderRadius: 10, padding: "12px 24px", cursor: "pointer", fontWeight: 700 },
+//     secondary: { background: "rgba(255,255,255,0.07)", color: "#e2e8f0", border: "1px solid #333", borderRadius: 10, padding: "12px 24px", cursor: "pointer" }
+//   }
+// };
 
-// ─── HELPERS ──────────────────────────────────────────────────────────────────
-function calcFare(bus, fromStop, toStop) {
-  const fi = bus.stops.indexOf(fromStop);
-  const ti = bus.stops.indexOf(toStop);
-  if (fi === -1 || ti === -1) return 0;
-  const fraction = (ti - fi) / (bus.stops.length - 1);
-  return Math.round(bus.total_km * fraction * bus.fare_per_km);
-}
+// // ─── HELPERS ──────────────────────────────────────────────────────────────────
+// function calcFare(bus, fromStop, toStop) {
+//   const fi = bus.stops.indexOf(fromStop);
+//   const ti = bus.stops.indexOf(toStop);
+//   if (fi === -1 || ti === -1) return 0;
+//   const fraction = (ti - fi) / (bus.stops.length - 1);
+//   return Math.round(bus.total_km * fraction * bus.fare_per_km);
+// }
 
-function getStopETA(bus, stopIndex, currentIndex, delayMins) {
-  if (stopIndex <= currentIndex) return "Passed";
-  const baseTime = bus.timings[stopIndex];
-  const [h, m] = baseTime.split(":").map(Number);
-  const totalMins = h * 60 + m + delayMins;
-  return `${String(Math.floor(totalMins / 60) % 24).padStart(2, "0")}:${String(totalMins % 60).padStart(2, "0")}`;
-}
+// function getStopETA(bus, stopIndex, currentIndex, delayMins) {
+//   if (stopIndex <= currentIndex) return "Passed";
+//   const baseTime = bus.timings[stopIndex];
+//   const [h, m] = baseTime.split(":").map(Number);
+//   const totalMins = h * 60 + m + delayMins;
+//   return `${String(Math.floor(totalMins / 60) % 24).padStart(2, "0")}:${String(totalMins % 60).padStart(2, "0")}`;
+// }
 
-// ─── COMPONENTS ───────────────────────────────────────────────────────────────
+// // ─── COMPONENTS ───────────────────────────────────────────────────────────────
 
-function Navbar({ user, setPage, lang, setLang, t }) {
-  const [open, setOpen] = useState(false);
-  return (
-    <nav style={{ background: "rgba(7,13,26,0.95)", padding: 15, borderBottom: "1px solid #222", position: "sticky", top: 0, zIndex: 100 }}>
-      <div style={{ ...S.container, ...S.flexBetween }}>
-        <div onClick={() => setPage("home")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 24 }}>🚌</span>
-          <span style={{ fontWeight: 800, color: "#667eea" }}>{t.appName}</span>
-        </div>
-        <div style={{ display: "flex", gap: 10 }}>
-            <button onClick={() => setOpen(!open)} style={S.btn.secondary}>🌐 {TRANSLATIONS[lang].flag}</button>
-            {open && (
-                <div style={{ position: "absolute", top: 60, right: 20, background: "#0a1526", border: "1px solid #333", borderRadius: 10, padding: 10 }}>
-                    {Object.keys(TRANSLATIONS).map(l => (
-                        <div key={l} onClick={() => {setLang(l); setOpen(false);}} style={{ padding: 10, cursor: "pointer" }}>{TRANSLATIONS[l].name}</div>
-                    ))}
-                </div>
-            )}
-            {user ? (
-                <button onClick={() => setPage("dashboard")} style={S.btn.primary}>Dashboard</button>
-            ) : (
-                <button onClick={() => setPage("login")} style={S.btn.primary}>{t.login}</button>
-            )}
-        </div>
-      </div>
-    </nav>
-  );
-}
+// function Navbar({ user, setPage, lang, setLang, t }) {
+//   const [open, setOpen] = useState(false);
+//   return (
+//     <nav style={{ background: "rgba(7,13,26,0.95)", padding: 15, borderBottom: "1px solid #222", position: "sticky", top: 0, zIndex: 100 }}>
+//       <div style={{ ...S.container, ...S.flexBetween }}>
+//         <div onClick={() => setPage("home")} style={{ cursor: "pointer", display: "flex", alignItems: "center", gap: 8 }}>
+//           <span style={{ fontSize: 24 }}>🚌</span>
+//           <span style={{ fontWeight: 800, color: "#667eea" }}>{t.appName}</span>
+//         </div>
+//         <div style={{ display: "flex", gap: 10 }}>
+//             <button onClick={() => setOpen(!open)} style={S.btn.secondary}>🌐 {TRANSLATIONS[lang].flag}</button>
+//             {open && (
+//                 <div style={{ position: "absolute", top: 60, right: 20, background: "#0a1526", border: "1px solid #333", borderRadius: 10, padding: 10 }}>
+//                     {Object.keys(TRANSLATIONS).map(l => (
+//                         <div key={l} onClick={() => {setLang(l); setOpen(false);}} style={{ padding: 10, cursor: "pointer" }}>{TRANSLATIONS[l].name}</div>
+//                     ))}
+//                 </div>
+//             )}
+//             {user ? (
+//                 <button onClick={() => setPage("dashboard")} style={S.btn.primary}>Dashboard</button>
+//             ) : (
+//                 <button onClick={() => setPage("login")} style={S.btn.primary}>{t.login}</button>
+//             )}
+//         </div>
+//       </div>
+//     </nav>
+//   );
+// }
 
-function TrackingPage({ t }) {
-  const [bus, setBus] = useState(RURAL_BUSES[0]);
-  return (
-    <div style={{ ...S.container, padding: "40px 20px" }}>
-        <h2>📍 {t.trackBus}</h2>
-        <div style={{ ...S.card, marginTop: 20 }}>
-            <h3>{bus.name} ({bus.id})</h3>
-            <p>Speed: {bus.speed} km/h | Next Stop: {bus.stops[bus.currentStopIndex + 1]}</p>
-            <div style={{ height: 10, background: "#333", borderRadius: 5, marginTop: 20, position: "relative" }}>
-                <div style={{ position: "absolute", left: `${(bus.currentStopIndex / (bus.stops.length-1))*100}%`, top: -10, fontSize: 20 }}>🚌</div>
-            </div>
-        </div>
-    </div>
-  );
-}
+// function TrackingPage({ t }) {
+//   const [bus, setBus] = useState(RURAL_BUSES[0]);
+//   return (
+//     <div style={{ ...S.container, padding: "40px 20px" }}>
+//         <h2>📍 {t.trackBus}</h2>
+//         <div style={{ ...S.card, marginTop: 20 }}>
+//             <h3>{bus.name} ({bus.id})</h3>
+//             <p>Speed: {bus.speed} km/h | Next Stop: {bus.stops[bus.currentStopIndex + 1]}</p>
+//             <div style={{ height: 10, background: "#333", borderRadius: 5, marginTop: 20, position: "relative" }}>
+//                 <div style={{ position: "absolute", left: `${(bus.currentStopIndex / (bus.stops.length-1))*100}%`, top: -10, fontSize: 20 }}>🚌</div>
+//             </div>
+//         </div>
+//     </div>
+//   );
+// }
 
-function BookingPage({ user, t }) {
-    const [from, setFrom] = useState("");
-    const [to, setTo] = useState("");
-    const [results, setResults] = useState([]);
-    const handleSearch = () => {
-        setResults(RURAL_BUSES.filter(b => b.stops.includes(from) && b.stops.includes(to)));
-    };
-    return (
-        <div style={{ ...S.container, padding: "40px 20px" }}>
-            <h2>🎫 {t.bookTicket}</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 20 }}>
-                <select style={S.input} onChange={e => setFrom(e.target.value)}><option>From</option>{ALL_STOPS.map(s => <option key={s}>{s}</option>)}</select>
-                <select style={S.input} onChange={e => setTo(e.target.value)}><option>To</option>{ALL_STOPS.map(s => <option key={s}>{s}</option>)}</select>
-            </div>
-            <button onClick={handleSearch} style={{ ...S.btn.primary, marginTop: 20, width: "100%" }}>{t.searchBuses}</button>
-            <div style={{ marginTop: 30 }}>
-                {results.map(b => (
-                    <div key={b.id} style={{ ...S.card, marginBottom: 15 }}>
-                        <div style={S.flexBetween}>
-                            <span><b>{b.name}</b></span>
-                            <span style={{ color: "#38ef7d" }}>₹{calcFare(b, from, to)}</span>
-                        </div>
-                        <button style={{ ...S.btn.primary, marginTop: 10 }}>Book Now</button>
-                    </div>
-                ))}
-            </div>
-        </div>
-    );
-}
+// function BookingPage({ user, t }) {
+//     const [from, setFrom] = useState("");
+//     const [to, setTo] = useState("");
+//     const [results, setResults] = useState([]);
+//     const handleSearch = () => {
+//         setResults(RURAL_BUSES.filter(b => b.stops.includes(from) && b.stops.includes(to)));
+//     };
+//     return (
+//         <div style={{ ...S.container, padding: "40px 20px" }}>
+//             <h2>🎫 {t.bookTicket}</h2>
+//             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginTop: 20 }}>
+//                 <select style={S.input} onChange={e => setFrom(e.target.value)}><option>From</option>{ALL_STOPS.map(s => <option key={s}>{s}</option>)}</select>
+//                 <select style={S.input} onChange={e => setTo(e.target.value)}><option>To</option>{ALL_STOPS.map(s => <option key={s}>{s}</option>)}</select>
+//             </div>
+//             <button onClick={handleSearch} style={{ ...S.btn.primary, marginTop: 20, width: "100%" }}>{t.searchBuses}</button>
+//             <div style={{ marginTop: 30 }}>
+//                 {results.map(b => (
+//                     <div key={b.id} style={{ ...S.card, marginBottom: 15 }}>
+//                         <div style={S.flexBetween}>
+//                             <span><b>{b.name}</b></span>
+//                             <span style={{ color: "#38ef7d" }}>₹{calcFare(b, from, to)}</span>
+//                         </div>
+//                         <button style={{ ...S.btn.primary, marginTop: 10 }}>Book Now</button>
+//                     </div>
+//                 ))}
+//             </div>
+//         </div>
+//     );
+// }
 
-function Dashboard({ user, setPage, t }) {
-    return (
-        <div style={{ ...S.container, padding: "40px 20px" }}>
-            <h2 style={{ fontSize: 32 }}>Welcome, {user.name}! 👋</h2>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginTop: 30 }}>
-                <div onClick={() => setPage("booking")} style={{ ...S.card, cursor: "pointer", textAlign: "center" }}>
-                    <div style={{ fontSize: 40 }}>🎫</div>
-                    <h3>{t.bookTicket}</h3>
-                </div>
-                <div onClick={() => setPage("tracking")} style={{ ...S.card, cursor: "pointer", textAlign: "center" }}>
-                    <div style={{ fontSize: 40 }}>📍</div>
-                    <h3>{t.trackBus}</h3>
-                </div>
-                <div onClick={() => setPage("payment")} style={{ ...S.card, cursor: "pointer", textAlign: "center" }}>
-                    <div style={{ fontSize: 40 }}>💳</div>
-                    <h3>{t.payment}</h3>
-                </div>
-                <div onClick={() => setPage("feedback")} style={{ ...S.card, cursor: "pointer", textAlign: "center" }}>
-                    <div style={{ fontSize: 40 }}>⭐</div>
-                    <h3>{t.feedback}</h3>
-                </div>
-            </div>
-        </div>
-    );
-}
+// function Dashboard({ user, setPage, t }) {
+//     return (
+//         <div style={{ ...S.container, padding: "40px 20px" }}>
+//             <h2 style={{ fontSize: 32 }}>Welcome, {user.name}! 👋</h2>
+//             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginTop: 30 }}>
+//                 <div onClick={() => setPage("booking")} style={{ ...S.card, cursor: "pointer", textAlign: "center" }}>
+//                     <div style={{ fontSize: 40 }}>🎫</div>
+//                     <h3>{t.bookTicket}</h3>
+//                 </div>
+//                 <div onClick={() => setPage("tracking")} style={{ ...S.card, cursor: "pointer", textAlign: "center" }}>
+//                     <div style={{ fontSize: 40 }}>📍</div>
+//                     <h3>{t.trackBus}</h3>
+//                 </div>
+//                 <div onClick={() => setPage("payment")} style={{ ...S.card, cursor: "pointer", textAlign: "center" }}>
+//                     <div style={{ fontSize: 40 }}>💳</div>
+//                     <h3>{t.payment}</h3>
+//                 </div>
+//                 <div onClick={() => setPage("feedback")} style={{ ...S.card, cursor: "pointer", textAlign: "center" }}>
+//                     <div style={{ fontSize: 40 }}>⭐</div>
+//                     <h3>{t.feedback}</h3>
+//                 </div>
+//             </div>
+//         </div>
+//     );
+// }
 
-function AuthPage({ mode, onLogin, setPage, t }) {
-  const [email, setEmail] = useState("");
-  return (
-    <div style={{ minHeight: "80vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
-      <div style={{ ...S.card, width: 380, textAlign: "center" }}>
-        <h2>{mode === "login" ? t.loginTitle : t.registerTitle}</h2>
-        <input style={{ ...S.input, marginTop: 20 }} placeholder="Email or Mobile" onChange={e => setEmail(e.target.value)} />
-        <button style={{ ...S.btn.primary, width: "100%", marginTop: 20 }} onClick={() => onLogin({ name: email.split('@')[0] || "User" })}>Continue</button>
-      </div>
-    </div>
-  );
-}
+// function AuthPage({ mode, onLogin, setPage, t }) {
+//   const [email, setEmail] = useState("");
+//   return (
+//     <div style={{ minHeight: "80vh", display: "flex", justifyContent: "center", alignItems: "center" }}>
+//       <div style={{ ...S.card, width: 380, textAlign: "center" }}>
+//         <h2>{mode === "login" ? t.loginTitle : t.registerTitle}</h2>
+//         <input style={{ ...S.input, marginTop: 20 }} placeholder="Email or Mobile" onChange={e => setEmail(e.target.value)} />
+//         <button style={{ ...S.btn.primary, width: "100%", marginTop: 20 }} onClick={() => onLogin({ name: email.split('@')[0] || "User" })}>Continue</button>
+//       </div>
+//     </div>
+//   );
+// }
 
-// ─── MAIN APP ─────────────────────────────────────────────────────────────────
-function App() {
-  const [lang, setLang] = useState("en");
-  const [page, setPage] = useState("home");
-  const [user, setUser] = useState(null);
-  const t = TRANSLATIONS[lang];
+// // ─── MAIN APP ─────────────────────────────────────────────────────────────────
+// function App() {
+//   const [lang, setLang] = useState("en");
+//   const [page, setPage] = useState("home");
+//   const [user, setUser] = useState(null);
+//   const t = TRANSLATIONS[lang];
 
-  return (
-    <div style={S.page}>
-      <Navbar user={user} setPage={setPage} lang={lang} setLang={setLang} t={t} />
-      <main>
-        {page === "home" && (
-            <div style={{ ...S.container, textAlign: "center", padding: "100px 20px" }}>
-                <h1 style={{ fontSize: 52 }}>{t.heroTitle} <span style={{ color: "#667eea" }}>{t.heroTitleAccent}</span></h1>
-                <p style={{ maxWidth: 600, margin: "20px auto" }}>{t.heroSub}</p>
-                <button onClick={() => setPage("register")} style={{ ...S.btn.primary, marginTop: 20 }}>{t.getStarted}</button>
-            </div>
-        )}
-        {page === "dashboard" && user && <Dashboard user={user} setPage={setPage} t={t} />}
-        {page === "tracking" && user && <TrackingPage t={t} />}
-        {page === "booking" && user && <BookingPage user={user} t={t} />}
-        {(page === "login" || page === "register") && <AuthPage mode={page} onLogin={u => { setUser(u); setPage("dashboard"); }} t={t} />}
-      </main>
-      <footer style={{ textAlign: "center", padding: 60, borderTop: "1px solid #222", marginTop: 40 }}>
-        <p style={{ color: "#667eea", fontWeight: 700 }}>BusGo Rural Edition • Hackathon 2026</p>
-      </footer>
-    </div>
-  );
-}
+//   return (
+//     <div style={S.page}>
+//       <Navbar user={user} setPage={setPage} lang={lang} setLang={setLang} t={t} />
+//       <main>
+//         {page === "home" && (
+//             <div style={{ ...S.container, textAlign: "center", padding: "100px 20px" }}>
+//                 <h1 style={{ fontSize: 52 }}>{t.heroTitle} <span style={{ color: "#667eea" }}>{t.heroTitleAccent}</span></h1>
+//                 <p style={{ maxWidth: 600, margin: "20px auto" }}>{t.heroSub}</p>
+//                 <button onClick={() => setPage("register")} style={{ ...S.btn.primary, marginTop: 20 }}>{t.getStarted}</button>
+//             </div>
+//         )}
+//         {page === "dashboard" && user && <Dashboard user={user} setPage={setPage} t={t} />}
+//         {page === "tracking" && user && <TrackingPage t={t} />}
+//         {page === "booking" && user && <BookingPage user={user} t={t} />}
+//         {(page === "login" || page === "register") && <AuthPage mode={page} onLogin={u => { setUser(u); setPage("dashboard"); }} t={t} />}
+//       </main>
+//       <footer style={{ textAlign: "center", padding: 60, borderTop: "1px solid #222", marginTop: 40 }}>
+//         <p style={{ color: "#667eea", fontWeight: 700 }}>BusGo Rural Edition • Hackathon 2026</p>
+//       </footer>
+//     </div>
+//   );
+// }
