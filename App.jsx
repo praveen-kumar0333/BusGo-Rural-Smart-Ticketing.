@@ -1,6 +1,7 @@
 
 
-import { useState, useEffect, useRef } from "react";
+// import { useState, useEffect, useRef } from "react";
+const { useState, useEffect, useRef } = React;
 
 // ─── TRANSLATIONS (7 languages) ──────────────────────────────────────────────
 const TRANSLATIONS = {
@@ -1516,7 +1517,7 @@ function FeedbackPage({ user, feedbacks, addFeedback, t }) {
 }
 
 // ─── MAIN APP ─────────────────────────────────────────────────────────────────
-export default function App() {
+function App() {
   const [lang, setLang] = useState("en");
   const [page, setPage] = useState("home");
   const [user, setUser] = useState(null);
