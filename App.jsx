@@ -1,7 +1,4 @@
-/**
- * Smart Bus Ticketing System — Rural Edition
- * Improved: Rural routes, Kannada language, live bus status in search
- */
+
 
 import { useState, useEffect, useRef } from "react";
 
