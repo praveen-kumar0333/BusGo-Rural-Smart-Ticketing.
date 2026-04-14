@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -16,39 +16,41 @@
         root.render(<App />);
     </script>
 </body>
-</html>
+</html> -->
 
 
-
-<!-- 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>BusGo Rural</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BusGo - Rural Smart Ticketing</title>
     <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script>
-        // This fixes the "exports is not defined" error
-        window.exports = {};
-        // This fixes the "useState is undefined" error by making them global
+        // Compatibility Layer to fix Console Errors
+        window.exports = {}; 
         window.useState = React.useState;
         window.useEffect = React.useEffect;
         window.useRef = React.useRef;
     </script>
+    <style>body { margin: 0; background: #070d1a; }</style>
 </head>
-<body style="background: #070d1a;">
+<body>
     <div id="root"></div>
     <script type="text/babel" src="App.jsx"></script>
     <script type="text/babel">
-        const interval = setInterval(() => {
+        // Wait for Babel to finish transforming App.jsx
+        const renderApp = () => {
             if (typeof App !== 'undefined') {
                 const root = ReactDOM.createRoot(document.getElementById('root'));
                 root.render(<App />);
-                clearInterval(interval);
+            } else {
+                setTimeout(renderApp, 100);
             }
-        }, 100);
+        };
+        renderApp();
     </script>
 </body>
-</html> -->
+</html>
